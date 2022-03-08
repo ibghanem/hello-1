@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: "test123-18fe"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: "test123-18fe"
+  template:
+    metadata:
+      labels:
+        app: "test123-18fe"
+    spec:
+      containers:
+        - name: "test123-18fe"
+          image: "acrdemo1231.azurecr.io/test123"
+          ports:
+          - containerPort: 80
