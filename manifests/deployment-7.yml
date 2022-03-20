@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: "testlabaks-9c6b"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: "testlabaks-9c6b"
+  template:
+    metadata:
+      labels:
+        app: "testlabaks-9c6b"
+    spec:
+      containers:
+        - name: "testlabaks-9c6b"
+          image: "testlabaks21.azurecr.io/testlabaks"
+          ports:
+          - containerPort: 80
