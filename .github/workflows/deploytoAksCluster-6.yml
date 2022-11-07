@@ -1,0 +1,50 @@
+on: [push]
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    
+    - uses: azure/docker-login@v1
+      with:
+        login-server: registrydemoaks.azurecr.io
+        username: ${{ secrets.acr_registrydemoaks_username }}
+        password: ${{ secrets.acr_registrydemoaks_password }}
+    
+    - name: Build and push image to ACR
+      id: build-image
+      run: |
+        docker build "$GITHUB_WORKSPACE/" -f  "Dockerfile" -t registrydemoaks.azurecr.io/demoaks4:${{ github.sha }} --label dockerfile-path=Dockerfile
+        docker push registrydemoaks.azurecr.io/demoaks4:${{ github.sha }}
+    
+    - uses: azure/k8s-set-context@v1
+      with:
+         kubeconfig: ${{ secrets.aks_demoaks4_kubeConfig }}
+      id: login
+    
+    - name: Create namespace
+      run: |
+        namespacePresent=`kubectl get namespace | grep demoaks4a4dd | wc -l`
+        if [ $namespacePresent -eq 0 ]
+        then
+            echo `kubectl create namespace demoaks4a4dd`
+        fi
+
+    - uses: azure/k8s-create-secret@v1
+      with:
+        namespace: demoaks4a4dd
+        container-registry-url: registrydemoaks.azurecr.io
+        container-registry-username: ${{ secrets.acr_registrydemoaks_username }}
+        container-registry-password: ${{ secrets.acr_registrydemoaks_password }}
+        secret-name: demoaks4dockerauth
+       
+    - uses: azure/k8s-deploy@v1.2
+      with:
+        namespace: demoaks4a4dd
+        manifests: |
+          manifests/deployment-12.yml
+          manifests/service-12.yml
+        images: |
+          registrydemoaks.azurecr.io/demoaks4:${{ github.sha }}
+        imagepullsecrets: |
+          demoaks4dockerauth
