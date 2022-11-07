@@ -19,7 +19,9 @@ jobs:
     
     - uses: azure/k8s-set-context@v1
       with:
-         kubeconfig: ${{ secrets.aks_demoaks4_kubeConfig }}
+         client-id: "5e91c637-7b6e-41af-a21b-a1e0490fbb1c"
+         tenant-id: "0f542e4f-0469-4998-8325-8f33ecd14878"
+         subscription-id: "3499fb03-2a71-4296-ba87-6e140b0540f6" 
       id: login
     
     - name: Create namespace
@@ -41,9 +43,12 @@ jobs:
     - uses: azure/k8s-deploy@v1.2
       with:
         namespace: demoaks4a4dd
-        manifests: |
-          manifests/deployment-12.yml
-          manifests/service-12.yml
+        manifests: |    
+          ./strapi-service.yaml
+          ./strapi-deployment.yaml
+          ./strapi-service.yaml
+          ./postgresdb-claim0-persistentvolumeclaim.yaml
+
         images: |
           registrydemoaks.azurecr.io/demoaks4:${{ github.sha }}
         imagepullsecrets: |
