@@ -4,19 +4,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: ACR build
-      id: build-push-acr
-      uses: azure/acr-build@v1
-      with:
-          service_principal: "a37780e4-b314-42b8-b5ac-22cd7ee8b67c"
-          service_principal_password: "nqs8Q~ZzVRrat6fzQIoPmZ3-B5apw_8kVBNJ9aTA"
-          tenant: "72f988bf-86f1-41af-91ab-2d7cd011db47"
-          registry: "registrydemoaks"
-          repository: "strapi"
-          image:  azure-vote-front
-          folder: azure-vote
-          branch: master
-          tag: ${{ github.sha }}
     - name: Azure login
       id: login
       uses: azure/login@v1.4.3
@@ -31,6 +18,20 @@ jobs:
     - name: Setup kubectl
       id: install-kubectl
       uses: azure/setup-kubectl@v3
+    - name: ACR build
+      id: build-push-acr
+      uses: azure/acr-build@v1
+      with:
+          service_principal: "a37780e4-b314-42b8-b5ac-22cd7ee8b67c"
+          service_principal_password: "nqs8Q~ZzVRrat6fzQIoPmZ3-B5apw_8kVBNJ9aTA"
+          tenant: "72f988bf-86f1-41af-91ab-2d7cd011db47"
+          registry: "registrydemoaks"
+          repository: "strapi"
+          image:  azure-vote-front
+          folder: azure-vote
+          branch: master
+          tag: ${{ github.sha }}
+   
     - name: Build and push image to ACR
       id: build-image
       run: |
